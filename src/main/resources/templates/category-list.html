@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LibraryMS · Dashboard</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-category-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}" class="active"><span class="dot"></span><span>🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">Welcome back, <span>Category</span></div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div th:if="${success}" class="alert alert-success">
+        <div class="icon">✓</div>
+        <div class="alert-content">
+            <div class="alert-title">Success!</div>
+            <div class="alert-description" th:text="${success}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+        <div class="alert-progress"></div>
+    </div>
+
+    <!-- Error Alert -->
+    <div th:if="${error}" class="alert alert-error">
+        <div class="icon">!</div>
+        <div class="alert-content">
+            <div class="alert-title">Error!</div>
+            <div class="alert-description" th:text="${error}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+    </div>
+
+    <!-- FULL COLUMN -->
+    <div class="left">
+        <div class="card">
+            <div class="book">
+                <div class="title">🔖 Category Management</div>
+                <!-- Search Form -->
+                <form id="searchForm" class="search-form" onsubmit="return false;">
+                    <div class="input-wrapper">
+                        <input type="text" name="categorySearch" id="categorySearch" placeholder="🔍 Search by category name" class="search-input">
+                    </div>
+                </form>
+            </div>
+            <div class="table-wrapper">
+                <table id="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="category : ${categories}" class="tr">
+                        <td th:text="${category.id}"></td>
+                        <td th:text="${category.name}"></td>
+                        <td>
+                            <a th:href="@{/categories/edit/{id}(id=${category.id})}" class="btn">Edit</a>
+                            <a th:href="@{/categories/delete/{id}(id=${category.id})}" class="btn btn-danger" style="background: #ff5f6d;"
+                               onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript">
+    // ✅ Filter function for categories
+    function filterCategories() {
+        const searchValue = document.getElementById('categorySearch').value.trim().toLowerCase();
+        const rows = document.querySelectorAll('#table tbody tr');
+
+        rows.forEach(row => {
+            const nameCell = row.querySelector('td:nth-child(2)'); // Category Name column
+            const nameText = nameCell.textContent.toLowerCase();
+
+            const matchesSearch = searchValue === '' || nameText.includes(searchValue);
+            row.style.display = matchesSearch ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prevent form reload
+        document.getElementById('searchForm').addEventListener('submit', e => e.preventDefault());
+        // Run search immediately
+        document.getElementById('categorySearch').addEventListener('input', filterCategories);
+    });
+</script>
+<script th:src="@{/js/style.js}"></script>
+</body>
+</html>

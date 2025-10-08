@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'Category Form'}"></title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-category-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}" class="active"><span class="dot"></span><span>🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">
+            <span th:text="${pageTitle ?: 'Edit Category'}"></span>
+        </div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card">
+        <div class="book">
+            <div class="title">🔖 Category Form</div>
+        </div>
+        <form th:action="@{/categories}" th:object="${category}" method="post" class="form-grid">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-field">
+                <label for="name">Category Name</label>
+                <input type="text" th:field="*{name}" id="name" placeholder="Enter category name" required />
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Save</button>
+                <a th:href="@{/categories}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+</body>
+</html>

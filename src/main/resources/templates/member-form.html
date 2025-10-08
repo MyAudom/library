@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${member.id} ? 'Edit Member' : 'Add New Member'">Member Form</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-member-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}" class="active"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}"><span class="dot"></span><span>📖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">
+            <span th:text="${member.id} ? 'Welcome to Edit Member' : 'Welcome to Add New Member'"></span>
+        </div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card">
+        <div class="book">
+            <div class="title">👥 Member Form</div>
+        </div>
+        <form th:action="@{/members/save}" th:object="${member}" method="post" class="form-grid" id="memberForm">
+            <input type="hidden" th:field="*{id}" id="memberId"/>
+
+            <div class="form-field">
+                <label for="name">Name</label>
+                <input type="text" th:field="*{name}" placeholder="ឈ្មោះ" id="name" required/>
+                <div class="loading-spinner" id="nameSpinner"></div>
+                <div class="validation-message" id="nameValidation"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="email">Email</label>
+                <input type="email" th:field="*{email}" placeholder="អ៊ីម៉ែល" id="email" required/>
+                <div class="loading-spinner" id="emailSpinner"></div>
+                <div class="validation-message" id="emailValidation"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="phone">Phone</label>
+                <input type="text" th:field="*{phone}" placeholder="លេខទូរសព្ទ" id="phone"/>
+                <div class="loading-spinner" id="phoneSpinner"></div>
+                <div class="validation-message" id="phoneValidation"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Member</button>
+                <a th:href="@{/members}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+
+<script th:src="@{/js/style.js}"></script>
+</body>
+</html>

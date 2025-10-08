@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add/Edit Book</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-book-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}" class="active"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}"><span class="dot"></span><span>📖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">
+            <span th:text="${book.id} ? 'Welcome to Edit Book' : 'Welcome to Add New Book'"></span>
+        </div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card">
+        <div class="book">
+            <div class="title">📚 Book Form</div>
+        </div>
+        <form th:object="${book}" th:action="@{/books}" method="post" class="form-grid" id="bookForm">
+            <input type="hidden" th:field="*{id}"/>
+
+            <!-- Row 1 -->
+            <div class="form-field" id="titleField">
+                <label>Title <span class="validation-spinner" id="titleSpinner"></span></label>
+                <input type="text" th:field="*{title}" placeholder="ឈ្មោះសៀវភៅ" class="search-input" required onblur="validateField('title', this.value)" onInput="clearValidation('titleField')"/>
+                <div class="error-message" id="titleError">This title already exists!</div>
+            </div>
+            <div class="form-field" id="isbnField">
+                <label>ISBN <span class="validation-spinner" id="isbnSpinner"></span></label>
+                <input type="text" th:field="*{isbn}" placeholder="លេខកូដសៀវភៅ" class="search-input" required onblur="validateField('isbn', this.value)" onInput="clearValidation('isbnField')"/>
+                <div class="error-message" id="isbnError">This ISBN already exists!</div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="form-field">
+                <label>Author</label>
+                <input type="text" th:field="*{author}" placeholder="ឈ្មោះអ្នកបង្កើតសៀវភៅ" class="search-input" required/>
+            </div>
+            <div class="form-field" id="libraryCodeField">
+                <label>Library Code <span class="validation-spinner" id="libraryCodeSpinner"></span></label>
+                <input type="text" th:field="*{libraryCode}" placeholder="លេខសម្គាល់ ឧ. LIB-001" class="search-input" required onblur="validateField('libraryCode', this.value)" onInput="clearValidation('libraryCodeField')"/>
+                <div class="error-message" id="libraryCodeError">This library code already exists!</div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="form-field">
+                <label>Publication Year</label>
+                <input type="number" th:field="*{publicationYear}" min="0" class="search-input" required/>
+            </div>
+            <div class="form-field form-field-book-category">
+                <div class="form-row-add">
+                    <div class="form-field">
+                        <label>Book Category:</label>
+                        <select th:field="*{bookCategory}" id="bookCategorySelect" required onchange="toggleCustomCategory()" style="width: 350px;">
+                            <option value="">Select Category</option>
+                            <!-- ប្រភេទពី database -->
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.name}"
+                                    th:text="${category.name}"
+                                    th:selected="${category.name == book.bookCategory}">
+                            </option>
+                            <!-- Default categories បើគ្មានក្នុង database -->
+                            <th:block th:if="${#lists.isEmpty(categories)}">
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Science">Science</option>
+                                <option value="Technology">Technology</option>
+                                <option value="History">History</option>
+                                <option value="Biography">Biography</option>
+                                <option value="Literature">Literature</option>
+                                <option value="Children">Children</option>
+                                <option value="Romance">Romance</option>
+                                <option value="Mystery">Mystery</option>
+                                <option value="Fantasy">Fantasy</option>
+                                <option value="Horror">Horror</option>
+                                <option value="Self-Help">Self-Help</option>
+                                <option value="Education">Education</option>
+                                <option value="Religion">Religion</option>
+                                <option value="Art">Art</option>
+                                <option value="Cooking">Cooking</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Business">Business</option>
+                                <option value="Health">Health</option>
+                            </th:block>
+                            <option value="ADD_NEW">➕ Add New Category</option>
+                        </select>
+                    </div>
+                    <!-- Custom Category - positioned to the right -->
+                    <div class="form-field custom-category-input" id="customCategoryDiv" style="display:none;">
+                        <label for="customCategoryInput">Add New Category</label>
+                        <input type="text" id="customCategoryInput" class="search-input" placeholder="Enter new category name..." onchange="updateCategoryValue()"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="form-field">
+                <label>Total Copies</label>
+                <input type="number" th:field="*{totalCopies}" min="0" class="search-input" id="totalCopies" onchange="updateAvailableCopies()" required/>
+            </div>
+            <div class="form-field">
+                <label>Available Copies</label>
+                <input type="number" th:field="*{availableCopies}" min="0" class="search-input" id="availableCopies" readonly style="background-color:#f5f5f5;cursor:not-allowed;" required/>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn" id="saveBtn">💾 Save</button>
+                <a th:href="@{/books}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+<script th:src="@{/js/style.js}"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LibraryMS · Dashboard</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-member-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}" class="active"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}"><span class="dot"></span><span>🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">Welcome back, <span>Member</span></div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- Alert styles -->
+    <div th:if="${success}" class="alert alert-success">
+        <div class="icon">✓</div>
+        <div class="alert-content">
+            <div class="alert-title">Success!</div>
+            <div class="alert-description" th:text="${success}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+        <div class="alert-progress"></div>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error">
+        <div class="icon">!</div>
+        <div class="alert-content">
+            <div class="alert-title">Error!</div>
+            <div class="alert-description" th:text="${error}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+    </div>
+
+    <!-- FULL COLUMN -->
+    <div class="left">
+        <!-- Next event / due -->
+        <div class="card">
+            <div class="book">
+                <div class="title">👥 Member Management</div>
+                <!-- Search Form -->
+                <form id="searchForm" class="search-form" onsubmit="return false;">
+                    <div class="input-wrapper">
+                        <input type="text" name="memberSearch" id="memberSearch" placeholder="🔍 Search by name, email, or phone" class="search-input">
+                    </div>
+                </form>
+                <a th:href="@{/members/new}" class="link">Add New Member →</a>
+            </div>
+            <div class="table-wrapper">
+                <table id="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="member : ${members}"  class="tr">
+                            <td th:text="${member.id}"></td>
+                            <td th:text="${member.name}"></td>
+                            <td th:text="${member.email}"></td>
+                            <td th:text="${member.phone}"></td>
+                            <td>
+                                <a th:href="@{/members/edit/{id}(id=${member.id})}" class="btn">Edit</a>
+                                <a th:href="@{/members/delete/{id}(id=${member.id})}" class="btn btn-secondary" style="background: #ff5f6d;"
+                                   onclick="return confirm('Are you sure you want to delete this member?')">Delete</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript">
+    // ✅ Filter function for members
+    function filterMembers() {
+        const searchValue = document.getElementById('memberSearch').value.trim().toLowerCase();
+        const rows = document.querySelectorAll('#table tbody tr');
+
+        rows.forEach(row => {
+            const nameCell = row.querySelector('td:nth-child(2)');   // Name
+            const emailCell = row.querySelector('td:nth-child(3)');  // Email
+            const phoneCell = row.querySelector('td:nth-child(4)');  // Phone
+
+            const nameText = nameCell.textContent.toLowerCase();
+            const emailText = emailCell.textContent.toLowerCase();
+            const phoneText = phoneCell.textContent.toLowerCase();
+
+            const matchesSearch = searchValue === '' ||
+                nameText.includes(searchValue) ||
+                emailText.includes(searchValue) ||
+                phoneText.includes(searchValue);
+
+            row.style.display = matchesSearch ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // ⛔ Prevent form reload
+        document.getElementById('searchForm').addEventListener('submit', e => e.preventDefault());
+
+        // 🔍 Run search immediately when typing
+        document.getElementById('memberSearch').addEventListener('input', filterMembers);
+    });
+</script>
+<script th:src="@{/js/style.js}"></script>
+</body>
+</html>

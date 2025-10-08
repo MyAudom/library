@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Loans</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-loan-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}" class="active"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}"><span class="dot"></span><span>🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">Welcome back, <span>Loan</span></div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- Alert styles -->
+    <div th:if="${success}" class="alert alert-success">
+        <div class="icon">✓</div>
+        <div class="alert-content">
+            <div class="alert-title">Success!</div>
+            <div class="alert-description" th:text="${success}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+        <div class="alert-progress"></div>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error">
+        <div class="icon">!</div>
+        <div class="alert-content">
+            <div class="alert-title">Error!</div>
+            <div class="alert-description" th:text="${error}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+    </div>
+
+    <!-- FULL COLUMN -->
+    <div class="left">
+        <!-- Next event / due -->
+        <div class="card">
+            <div class="book">
+                <div class="title">📋 Loan Management</div>
+                <!-- Search Form -->
+                <form id="searchForm" class="search-form">
+                    <div class="input-wrapper" >
+                        <input type="text" name="memberName" id="memberName" placeholder="Search by member name" class="search-input" style="margin-bottom: 0;!important;width: auto">
+                    </div>
+                    <select name="returnStatus" id="returnStatus" class="search-select" style="min-width: 80px;!important;margin-bottom: 0;!important;">
+                        <option value="all">All</option>
+                        <option value="returned">Returned</option>
+                        <option value="notReturned">Not Returned</option>
+                    </select>
+                </form>
+                <a th:href="@{/loans/new}" class="link">Add New Loan →</a>
+            </div>
+            <div class="table-wrapper">
+                <table id="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Loan Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="loan : ${loans}"  class="tr">
+                            <td th:text="${loan.id}"></td>
+                            <td th:text="${loan.book.title}"></td>
+                            <td th:text="${loan.member.name}"></td>
+                            <td th:text="${loan.loanDate}"></td>
+                            <td th:text="${loan.dueDate}"></td>
+                            <td th:class="${loan.returnDate != null} ? 'returned' : 'not-returned'" th:text="${loan.returnDate != null} ? ${loan.returnDate} : 'Not Returned'"></td>
+                            <td>
+                                <a th:if="${loan.returnDate == null}" th:href="@{/loans/return/{id}(id=${loan.id})}" class="btn">Return</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript">
+    // ✅ Filter function
+    function filterLoans() {
+        const returnStatus = document.getElementById('returnStatus').value;
+        const searchValue = document.getElementById('memberName').value.trim().toLowerCase();
+        const rows = document.querySelectorAll('#table tbody tr'); // ✅ now matches table id
+
+        rows.forEach(row => {
+            const returnDateCell = row.querySelector('td:nth-child(6)'); // Return Date column
+            const memberNameCell = row.querySelector('td:nth-child(3)'); // Member Name column
+            const bookTitleCell = row.querySelector('td:nth-child(2)');  // Book Title column
+
+            const isReturned = returnDateCell.classList.contains('returned');
+            const memberNameText = memberNameCell.textContent.toLowerCase();
+            const bookTitleText = bookTitleCell.textContent.toLowerCase();
+
+            const matchesStatus = returnStatus === 'all' ||
+                (returnStatus === 'returned' && isReturned) ||
+                (returnStatus === 'notReturned' && !isReturned);
+
+            const matchesSearch = searchValue === '' ||
+                memberNameText.includes(searchValue) ||
+                bookTitleText.includes(searchValue);
+
+            row.style.display = matchesStatus && matchesSearch ? '' : 'none';
+        });
+    }
+
+    // ✅ Apply filter automatically when typing/selecting
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('memberName').addEventListener('input', filterLoans);
+        document.getElementById('returnStatus').addEventListener('change', filterLoans);
+    });
+</script>
+</body>
+</html>

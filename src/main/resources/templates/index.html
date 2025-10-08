@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LibraryMS · Dashboard</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-home-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}" class="active" data-tooltip="Dashboard"><span class="dot"></span><span class="icon">🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}" data-tooltip="Books"><span class="dot"></span><span class="icon">📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}" data-tooltip="Members"><span class="dot"></span><span class="icon">👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}" data-tooltip="Loans"><span class="dot"></span><span class="icon">📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}" data-tooltip="Category"><span class="dot"></span><span class="icon">🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}" data-tooltip="Analytics"><span class="dot"></span><span class="icon">📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">Welcome back, <span>Home</span></div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="grid">
+        <!-- LEFT COLUMN -->
+        <div class="left">
+            <!-- Standings-like table -->
+            <div class="card table">
+                <h3>Standings · Top categories</h3>
+                <table>
+                    <thead>
+                    <tr><th>#</th><th>Category</th><th>Title</th><th>Loans</th><th>Returns</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Programming</td><td>—</td><td>—</td><td>—</td></tr>
+                        <tr><td>2</td><td>Science</td><td>—</td><td>—</td><td>—</td></tr>
+                        <tr><td>3</td><td>History</td><td>—</td><td>—</td><td>—</td></tr>
+                        <tr><td>4</td><td>Art & Design</td><td>—</td><td>—</td><td>—</td></tr>
+                        <tr><td>5</td><td>Kids</td><td>—</td><td>—</td><td>—</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Chart (full width on left like a big card) -->
+            <div class="card chart">
+                <h3>📊 Weekly Library Activity</h3>
+                <canvas id="historyChart" width="800" height="400"></canvas>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="right">
+            <!-- Overview bar (mimics “Games statistic”) -->
+            <div class="card overview">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div style="font-weight:900">Library overview</div>
+                    <a th:href="@{/analytics}" class="link">view all statistics</a>
+                </div>
+                <div class="bar" id="stackBar">
+                    <div class="seg victories" id="segBooks" style="width:40%"></div>
+                    <div class="seg draws" id="segMembers" style="width:30%"></div>
+                    <div class="seg lost" id="segLoans" style="width:30%"></div>
+                </div>
+                <div class="row">
+                    <div>📚 <span id="lblBooks">Books</span></div>
+                    <div>👥 <span id="lblMembers">Members</span></div>
+                    <div>📋 <span id="lblLoans">Active Loans</span></div>
+                </div>
+            </div>
+
+            <!-- Four mini metric cards (like the reference) -->
+            <div class="mini-grid">
+                <div class="card mini">
+                    <div class="k">Return</div>
+                    <div class="v" id="possessPct">—</div>
+                </div>
+                <div class="card mini">
+                    <div class="k">Total Books</div>
+                    <div class="v" id="kBooks">0</div>
+                </div>
+                <div class="card mini">
+                    <div class="k">Total Members</div>
+                    <div class="v" id="kMembers">0</div>
+                </div>
+                <div class="card mini">
+                    <div class="k">Active Loans</div>
+                    <div class="v" id="kLoans">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // REPLACE THE ENTIRE SCRIPT SECTION IN YOUR index.html WITH THIS:
+
+    const API_BASE = '/api/library';
+
+    async function loadStats() {
+        try {
+            const [booksResponse, membersResponse, activeLoansResponse, doneActiveLoansResponse] = await Promise.all([
+                fetch(`${API_BASE}/books`).then(r => r.json()),
+                fetch(`${API_BASE}/members`).then(r => r.json()),
+                fetch(`${API_BASE}/active-loans-count`).then(r => r.json()),
+                fetch(`${API_BASE}/done-active-loans-count`).then(r => r.json())
+            ]);
+
+            const totalBooks = booksResponse.length;
+            const totalMembers = membersResponse.length;
+            const activeLoans = Number(activeLoansResponse) || 0;
+            const returnedLoans = Number(doneActiveLoansResponse) || 0;
+
+            document.getElementById('kBooks').textContent   = totalBooks;
+            document.getElementById('kMembers').textContent = totalMembers;
+            document.getElementById('kLoans').textContent   = activeLoans;
+
+            document.getElementById('lblBooks').textContent   = `Books: ${totalBooks}`;
+            document.getElementById('lblMembers').textContent = `Members: ${totalMembers}`;
+            document.getElementById('lblLoans').textContent   = `Active Loans: ${activeLoans}`;
+
+            const loanTotal = activeLoans + returnedLoans;
+            const possession = loanTotal ? Math.round((returnedLoans/loanTotal)*100) : 0;
+            document.getElementById('possessPct').textContent = possession + '%';
+
+            const sum = Math.max(totalBooks + totalMembers + activeLoans, 1);
+            document.getElementById('segBooks').style.width   = (totalBooks/sum*100).toFixed(2)+'%';
+            document.getElementById('segMembers').style.width = (totalMembers/sum*100).toFixed(2)+'%';
+            document.getElementById('segLoans').style.width   = (activeLoans/sum*100).toFixed(2)+'%';
+        } catch (error) {
+            console.error('Could not load stats - backend may not be running:', error);
+            const totalBooks=100, totalMembers=50, activeLoans=20, returnedLoans=30;
+            document.getElementById('kBooks').textContent   = totalBooks;
+            document.getElementById('kMembers').textContent = totalMembers;
+            document.getElementById('kLoans').textContent   = activeLoans;
+            document.getElementById('lblBooks').textContent   = `Books: ${totalBooks}`;
+            document.getElementById('lblMembers').textContent = `Members: ${totalMembers}`;
+            document.getElementById('lblLoans').textContent   = `Active Loans: ${activeLoans}`;
+            const loanTotal = activeLoans + returnedLoans;
+            document.getElementById('possessPct').textContent = Math.round((returnedLoans/loanTotal)*100) + '%';
+            const sum = totalBooks+totalMembers+activeLoans;
+            document.getElementById('segBooks').style.width   = (totalBooks/sum*100)+'%';
+            document.getElementById('segMembers').style.width = (totalMembers/sum*100)+'%';
+            document.getElementById('segLoans').style.width   = (activeLoans/sum*100)+'%';
+        }
+    }
+
+    async function displayWeeklyHistoryChart() {
+        try {
+            const response = await fetch('/api/history/weekly');
+            if (!response.ok) throw new Error('Failed to fetch weekly history');
+            const filteredData = await response.json();
+
+            filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const labels = filteredData.map(e => e.date);
+            const datasets = [
+                {
+                    label: 'Books ±',
+                    data: filteredData.map(e => e.totalBooks),
+                    backgroundColor: 'rgba(75, 192, 192, .85)',
+                    borderRadius: 10
+                },
+                {
+                    label: 'Members ±',
+                    data: filteredData.map(e => e.totalMembers),
+                    backgroundColor: 'rgba(255, 99, 132, .85)',
+                    borderRadius: 10
+                },
+                {
+                    label: 'Active Loans ±',
+                    data: filteredData.map(e => e.activeLoans),
+                    backgroundColor: 'rgba(54, 162, 235, .85)',
+                    borderRadius: 10
+                },
+                {
+                    label: 'Returned Loans ±',
+                    data: filteredData.map(e => e.returnedLoans),
+                    backgroundColor: 'rgba(255, 206, 86, .85)',
+                    borderRadius: 10
+                }
+            ];
+
+            new Chart(document.getElementById('historyChart'),{
+                type:'bar',
+                data:{ labels, datasets },
+                options:{
+                    responsive:true,
+                    plugins:{ legend:{ position:'top' } },
+                    scales:{ y:{ beginAtZero:true } }
+                }
+            });
+        } catch (error) {
+            console.error('Error displaying chart:', error);
+            document.getElementById('historyChart').outerHTML =
+                '<div style="padding:14px;color:#64748b">Error loading chart data from database.</div>';
+        }
+    }
+
+    async function loadTopCategories() {
+        console.log('Loading top categories...'); // Debug line
+
+        try {
+            // Try the corrected API path based on your BookController structure
+            const response = await fetch('/books/api/categories/top');
+            console.log('Response status:', response.status); // Debug line
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch categories: ${response.status}`);
+            }
+
+            const categories = await response.json();
+            console.log('Categories received:', categories); // Debug line
+
+            const tbody = document.querySelector('.card.table tbody');
+            if (!tbody) {
+                console.error('Table tbody not found');
+                return;
+            }
+
+            tbody.innerHTML = "";
+
+            if (!categories || categories.length === 0) {
+                // Show sample data when no real data is available
+                const sampleData = [
+                    { name: 'Programming', booksCount: 15, loansCount: 45, returnsCount: 30 },
+                    { name: 'Science', booksCount: 12, loansCount: 38, returnsCount: 25 },
+                    { name: 'History', booksCount: 10, loansCount: 28, returnsCount: 20 },
+                    { name: 'Art & Design', booksCount: 8, loansCount: 22, returnsCount: 15 },
+                    { name: 'Kids', booksCount: 6, loansCount: 18, returnsCount: 12 }
+                ];
+
+                sampleData.forEach((cat, index) => {
+                    const row = document.createElement('tr');
+                    row.style.opacity = '0.7'; // Show it's sample data
+                    row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td style="font-weight: 500; font-style: italic;">${cat.name} <small>(sample)</small></td>
+                    <td>${cat.booksCount}</td>
+                    <td>${cat.loansCount}</td>
+                    <td>${cat.returnsCount}</td>
+                `;
+                    tbody.appendChild(row);
+                });
+                return;
+            }
+
+            // Display real data
+            categories.forEach((cat, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${index + 1}</td>
+                <td style="font-weight: 500;">${cat.name}</td>
+                <td>${cat.booksCount}</td>
+                <td>${cat.loansCount}</td>
+                <td>${cat.returnsCount}</td>
+            `;
+                tbody.appendChild(row);
+            });
+
+            // Fill remaining rows if fewer than 5 categories
+            const remainingRows = 5 - categories.length;
+            for (let i = 0; i < remainingRows; i++) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.style.opacity = '0.5';
+                emptyRow.innerHTML = `
+                <td>${categories.length + i + 1}</td>
+                <td style="font-style: italic; color: #94a3b8;">—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+            `;
+                tbody.appendChild(emptyRow);
+            }
+
+        } catch (err) {
+            console.error("Error loading categories:", err);
+
+            // Fallback to show some sample data with error indicator
+            const tbody = document.querySelector('.card.table tbody');
+            if (tbody) {
+                tbody.innerHTML = `
+                <tr><td>1</td><td>Programming <small>(demo)</small></td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>2</td><td>Science <small>(demo)</small></td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>3</td><td>History <small>(demo)</small></td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>4</td><td>Art & Design <small>(demo)</small></td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td>5</td><td>Kids <small>(demo)</small></td><td>—</td><td>—</td><td>—</td></tr>
+            `;
+            }
+        }
+    }
+
+    // Initialize dashboard
+    loadStats();
+    displayWeeklyHistoryChart();
+    loadTopCategories();
+
+    // Add this to your existing script section
+    let currentDate = new Date();
+
+    function generateCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // Clear grid
+        grid.innerHTML = '';
+
+        // Add day headers
+        const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayHeaders.forEach(day => {
+            const header = document.createElement('div');
+            header.className = 'day-header';
+            header.textContent = day;
+            grid.appendChild(header);
+        });
+
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+        // Add previous month's trailing days
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const day = document.createElement('div');
+            day.className = 'day-cell other-month';
+            day.textContent = daysInPrevMonth - i;
+            grid.appendChild(day);
+        }
+
+        // Add current month's days
+        const today = new Date();
+        const eventDays = [5, 12, 18, 25]; // Sample event days - you can connect this to your API
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell';
+            dayCell.textContent = day;
+
+            // Mark today
+            if (year === today.getFullYear() &&
+                month === today.getMonth() &&
+                day === today.getDate()) {
+                dayCell.classList.add('today');
+            }
+
+            // Mark event days
+            if (eventDays.includes(day)) {
+                dayCell.classList.add('has-event');
+            }
+
+            grid.appendChild(dayCell);
+        }
+
+        // Add next month's leading days
+        const totalCells = grid.children.length;
+        const remainingCells = 42 - totalCells + 7; // 6 rows * 7 days + headers
+
+        for (let day = 1; day <= remainingCells && totalCells < 49; day++) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell other-month';
+            dayCell.textContent = day;
+            grid.appendChild(dayCell);
+        }
+
+        // Update title
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+        document.querySelector('.calendar-title').textContent =
+            `📅 ${monthNames[month]} ${year}`;
+    }
+
+    function previousMonth() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        generateCalendar();
+    }
+
+    function nextMonth() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        generateCalendar();
+    }
+
+    // Add this to your existing initialization calls
+    generateCalendar();
+</script>
+</body>
+</html>

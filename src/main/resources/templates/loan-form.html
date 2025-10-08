@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Loan</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-loan-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}" class="active"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}"><span class="dot"></span><span>🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">
+            <span>Add New Loan</span>
+        </div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card">
+        <div class="book">
+            <div class="title">📋 Loan Form</div>
+        </div>
+        <form th:object="${loan}" th:action="@{/loans}" method="post" class="form-grid">
+
+            <div class="form-field">
+                <label for="bookSelect">Book</label>
+                <select id="bookSelect" name="bookId" required class="input-select">
+                    <option value="">Select a book</option>
+                    <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title}"></option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="memberSelect">Member</label>
+                <select id="memberSelect" name="memberId" required class="input-select">
+                    <option value="">Select a member</option>
+                    <option th:each="member : ${members}" th:value="${member.id}" th:text="${member.name}"></option>
+                </select>
+            </div>
+
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Save Loan</button>
+                <a th:href="@{/loans}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+
+
+        $(document).ready(function() {
+            $('#bookSelect').select2({
+                placeholder: "Select a book",
+                allowClear: true,
+                width: '100%'   // សំខាន់, ដើម្បីឲ្យដូចគ្នា
+            });
+
+            $('#memberSelect').select2({
+                placeholder: "Select a member",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
+</script>
+</body>
+</html>

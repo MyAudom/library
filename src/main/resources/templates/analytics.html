@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LibraryMS · Dashboard</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-analytics-50.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">LibraryMS</div>
+    </div>
+    <nav class="nav">
+        <a th:href="@{/}"><span class="dot"></span><span>🏠</span><span class="txt">Dashboard</span></a>
+        <a th:href="@{/books}"><span class="dot"></span><span>📖</span><span class="txt">Books</span></a>
+        <a th:href="@{/members}"><span class="dot"></span><span>👥</span><span class="txt">Members</span></a>
+        <a th:href="@{/loans}"><span class="dot"></span><span>📋</span><span class="txt">Loans</span></a>
+        <a th:href="@{/categories}"><span class="dot"></span><span>🔖</span><span class="txt">Category</span></a>
+        <a th:href="@{/analytics}" class="active"><span class="dot"></span><span>📊</span><span class="txt">Analytics</span></a>
+    </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hello">Welcome back, <span>Analytics</span></div>
+        <div class="actions">
+            <div class="chip">Admin</div>
+            <div class="avatar"><div class="avatar"><img th:src="@{/images/HengAudom.png}" alt="avatar"/></div></div>
+        </div>
+    </div>
+    <!-- LEFT COLUMN -->
+    <div class="dashboard-container">
+        <div class="dashboard-grid">
+            <div class="main-stats">
+                <div class="stat-card books">
+                    <div class="stat-header">
+                        <div class="stat-title">Total Books</div>
+                        <div class="stat-icon">📖</div>
+                    </div>
+                    <div class="stat-number" id="totalBooks">0</div>
+                    <p class="stat-label">Books in Library</p>
+                </div>
+
+                <div class="stat-card members">
+                    <div class="stat-header">
+                        <div class="stat-title">Total Members</div>
+                        <div class="stat-icon">👥</div>
+                    </div>
+                    <div class="stat-number" id="totalMembers">0</div>
+                    <p class="stat-label">Registered Members</p>
+                </div>
+
+                <div class="stat-card loans">
+                    <div class="stat-header">
+                        <div class="stat-title">Active Loans</div>
+                        <div class="stat-icon">📋</div>
+                    </div>
+                    <div class="stat-number" id="activeLoans">0</div>
+                    <p class="stat-label">Books on Loan</p>
+                </div>
+
+                <div class="stat-card returned">
+                    <div class="stat-header">
+                        <div class="stat-title">Returned</div>
+                        <div class="stat-icon">✅</div>
+                    </div>
+                    <div class="stat-number" id="doneActiveLoans">0</div>
+                    <p class="stat-label">Books Returned</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card-header" style="background: white; border-radius: 16px 16px 0 0; margin-bottom: 0;">
+        <h2 class="card-title">⚡ Quick Actions</h2>
+    </div>
+
+    <div class="quick-actions" style="background: white; padding: 24px; border-radius: 0 0 16px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+        <div class="action-card-modern">
+            <div class="action-header">
+                <div class="action-icon-modern">📖</div>
+                <h3 class="action-title-modern">Book Management</h3>
+            </div>
+            <p class="action-description">Add, edit, and organize your book collection with detailed information including author, ISBN, publication date, and inventory tracking.</p>
+        </div>
+
+        <div class="action-card-modern">
+            <div class="action-header">
+                <div class="action-icon-modern">👥</div>
+                <h3 class="action-title-modern">Member Management</h3>
+            </div>
+            <p class="action-description">Register new members, manage their profiles, track membership status, and maintain comprehensive member records.</p>
+        </div>
+
+        <div class="action-card-modern">
+            <div class="action-header">
+                <div class="action-icon-modern">📋</div>
+                <h3 class="action-title-modern">Loan Tracking</h3>
+            </div>
+            <p class="action-description">Issue books to members, track due dates, manage returns, and monitor overdue items with automated notifications.</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+        <div class="card-header" style="background: white; border-radius: 16px 16px 0 0; margin-bottom: 0;">
+            <h2 class="card-title">👥 Team Members</h2>
+        </div>
+
+        <div style="background: white; padding: 24px; border-radius: 0 0 16px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+            <div class="team-grid">
+                <div class="team-card">
+                    <img th:src="@{/images/HengAudom.png}" alt="Heng Audom" class="team-avatar">
+                    <h3 class="team-name">Heng Audom</h3>
+                    <p class="team-role">Effortlessly manage your book collection with tools to add, edit, and organize books, including details like author, ISBN, publication date, and inventory tracking.</p>
+                </div>
+                <div class="team-card">
+                    <img th:src="@{/images/LamSreyNoch.jpg}" alt="Lam SreyNoch" class="team-avatar">
+                    <h3 class="team-name">Lam SreyNoch</h3>
+                    <p class="team-role">Enhance book loan management by registering new loans, monitoring loan status, managing borrower profiles, and maintaining detailed loan records.</p>
+                </div>
+                <div class="team-card">
+                    <img th:src="@{/images/ChorkNeangpy.jpg}" alt="Chork Neangpy" class="team-avatar">
+                    <h3 class="team-name">Chork Neangpy</h3>
+                    <p class="team-role">Add new books to your collection with ease, including details like title, author, ISBN, and publication date, while efficiently managing book inventory.</p>
+                </div>
+                <div class="team-card">
+                    <img th:src="@{/images/HoeurmChamrong.jpg}" alt="Hoeurm Chamrong" class="team-avatar">
+                    <h3 class="team-name">Hoeurm Chamrong</h3>
+                    <p class="team-role">Access the easy-to-use home page & dashboard to track book inventory, track loaned books, and view key library metrics at a glance.</p>
+                </div>
+                <div class="team-card">
+                    <img th:src="@{/images/DySamnang.jpg}" alt="Dy Samnang" class="team-avatar">
+                    <h3 class="team-name">Dy Samnang</h3>
+                    <p class="team-role">Easily add new members to the library system, capturing their details to manage profiles, track activity, and monitor membership status.</p>
+                </div>
+                <div class="team-card">
+                    <img th:src="@{/images/HengAudom.png}" alt="Heng Audom" class="team-avatar">
+                    <h3 class="team-name">Heng Audom</h3>
+                    <p class="team-role">Effortlessly organize and manage your website content with real-time updates, ensuring a seamless user experience for administrators and visitors.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>© 2025 Library Management System · Team 5</footer>
+</main>
+
+<script>
+    const API_BASE = '/api/library';
+
+    async function loadStats() {
+        try {
+            const [booksResponse, membersResponse, activeLoansResponse, doneActiveLoansResponse] = await Promise.all([
+                fetch(`${API_BASE}/books`).then(r => r.json()),
+                fetch(`${API_BASE}/members`).then(r => r.json()),
+                fetch(`${API_BASE}/active-loans-count`).then(r => r.json()),
+                fetch(`${API_BASE}/done-active-loans-count`).then(r => r.json())
+            ]);
+
+            animateNumber('totalBooks', booksResponse.length);
+            animateNumber('totalMembers', membersResponse.length);
+            animateNumber('activeLoans', activeLoansResponse);
+            animateNumber('doneActiveLoans', doneActiveLoansResponse);
+        } catch (error) {
+            console.error('Could not load stats - backend may not be running:', error);
+            animateNumber('totalBooks', 100);
+            animateNumber('totalMembers', 50);
+            animateNumber('activeLoans', 20);
+            animateNumber('doneActiveLoans', 30);
+        }
+    }
+
+    function animateNumber(elementId, targetNumber) {
+        const element = document.getElementById(elementId);
+        const duration = 1500;
+        const increment = targetNumber / (duration / 16);
+        let currentNumber = 0;
+
+        const timer = setInterval(() => {
+            currentNumber += increment;
+            if (currentNumber >= targetNumber) {
+                element.textContent = targetNumber;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(currentNumber);
+            }
+        }, 16);
+    }
+
+    loadStats();
+</script>
+</body>
+</html>
