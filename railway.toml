@@ -1,7 +1,5 @@
-[build]
+[buil]
 builder = "nixpacks"
 
 [deploy]
-startCommand = "java -jar build/libs/*[!plain].jar"
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+startCommand = "Java -jar build/libs/*[!plain].jar"
